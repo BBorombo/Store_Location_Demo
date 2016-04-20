@@ -1,8 +1,17 @@
 package com.borombo.demo.storelocatordemo;
 
+import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,7 +28,7 @@ import java.util.ArrayList;
 /**
  * Created by Erwan on 19/04/2016.
  */
-public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
+public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements LocationListener {
 
     private final String ID = "id";
     private final String NOM = "nom";
@@ -32,7 +41,7 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
     private final String HANDICAPE = "accesHandicape";
     private final String PARKING = "parking";
     private final String TERRASSE = "terrasse";
-    private final String ESPACEENFANT= "espaceEnfant";
+    private final String ESPACEENFANT = "espaceEnfant";
     private final String PHOTOURL = "photo";
     private final String INFOSSUP = "infosSupplementaires";
     private final String TELEPHONE = "Telephone";
@@ -42,13 +51,44 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
 
     Activity activity;
 
-    public MyAsyncTask(Activity activity){
+    private LocationManager locationManager;
+
+    Location userLocation;
+
+    public MyAsyncTask(Activity activity) {
         this.activity = activity;
+    }
+
+    @Override
+    protected void onPreExecute() {
+        locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+
+        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
+            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }else {
+            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        }
+
+        Log.d("UserLocation : ", userLocation.toString());
+
     }
 
     @Override
     protected JSONObject doInBackground(String... params) {
         StringBuilder stringData = new StringBuilder();
+
         try{
             URL url = new URL(params[0]);
             HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -103,5 +143,25 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
         i.putExtra("LIST", listRestaurants);
         activity.startActivity(i);
         activity.finish();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        this.userLocation = location;
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }
