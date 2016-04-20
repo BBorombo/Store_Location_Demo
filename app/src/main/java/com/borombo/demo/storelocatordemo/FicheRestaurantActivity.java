@@ -26,6 +26,8 @@ public class FicheRestaurantActivity extends AppCompatActivity {
     private TextView infosSup;
     private TextView telephone;
 
+    private TextView distance;
+
     private double latitude;
     private double longitude;
 
@@ -46,11 +48,14 @@ public class FicheRestaurantActivity extends AppCompatActivity {
         infosSup = (TextView) findViewById(R.id.name);*/
         telephone = (TextView) findViewById(R.id.telephone);
         image = (ImageView) findViewById(R.id.image);
+        distance = (TextView) findViewById(R.id.distance);
 
         name.append(restaurant.getNom());
         adresse.setText(restaurant.getAdresse());
         ville.setText(restaurant.getCodePostal() + " " + restaurant.getVille());
         telephone.append(restaurant.getTelephone());
+
+        distance.append(restaurant.getDistanceToUser() +" "+ restaurant.getDistanceUnit());
 
         Glide.with(this).load(restaurant.getPhotoUrl()).into(image);
 

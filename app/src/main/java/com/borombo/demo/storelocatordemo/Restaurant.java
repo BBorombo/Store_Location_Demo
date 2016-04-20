@@ -1,5 +1,7 @@
 package com.borombo.demo.storelocatordemo;
 
+import android.location.Location;
+
 import java.io.Serializable;
 
 /**
@@ -23,13 +25,31 @@ public class Restaurant implements Serializable{
     private String infosSup;
     private String telephone;
 
-    private int distanceToUser;
+    private float distanceToUser;
+    private String distanceUnit;
 
     /***********************
      *                     *
      *  Getters & Setters  *
      *                     *
      **********************/
+
+    public float getDistanceToUser(){return this.distanceToUser;}
+
+    public void setDistanceToUser(Location userLocation){
+        Location rLocation = new Location("Restaurant Location");
+        rLocation.setLongitude(this.longitude);
+        rLocation.setLatitude(this.latitude);
+        distanceToUser = userLocation.distanceTo(rLocation);
+        if (distanceToUser > 1000){
+            //distanceToUser/=1000;
+            distanceUnit = "km";
+        }else {
+            distanceUnit ="m";
+        }
+    }
+
+    public String getDistanceUnit() {return distanceUnit;}
 
     public int getId() {
         return id;

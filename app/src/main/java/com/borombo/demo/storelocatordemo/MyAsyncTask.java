@@ -2,7 +2,6 @@ package com.borombo.demo.storelocatordemo;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -11,7 +10,6 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +22,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * Created by Erwan on 19/04/2016.
@@ -55,34 +55,24 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
 
     Location userLocation;
 
-    public MyAsyncTask(Activity activity) {
+    public MyAsyncTask(Activity activity, LocationManager locationManager) {
         this.activity = activity;
+        this.locationManager = locationManager;
     }
 
     @Override
     protected void onPreExecute() {
-        locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-
+        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
         if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
-            }
             userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
             userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }else {
+        }else{
             userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         }
-
-        Log.d("UserLocation : ", userLocation.toString());
-
     }
 
     @Override
@@ -122,6 +112,7 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
                 r.setVille(c.getString(VILLE));
                 r.setLatitude(c.getDouble(LATITUDE));
                 r.setLongitude(c.getDouble(LONGITUDE));
+                r.setDistanceToUser(userLocation);
                 if (c.getString(HANDICAPE).equals("1"))
                     r.setHandicape(true);
                 if (c.getString(TERRASSE).equals("1"))
@@ -139,6 +130,14 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        Collections.sort(listRestaurants, new Comparator<Restaurant>() {
+            public int compare(Restaurant res1, Restaurant res2) {
+                return Float.valueOf(res1.getDistanceToUser()).compareTo(res2.getDistanceToUser());
+            }
+        });
+
+
         Intent i = new Intent(this.activity, MyListActivity.class);
         i.putExtra("LIST", listRestaurants);
         activity.startActivity(i);
