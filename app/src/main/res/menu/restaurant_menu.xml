@@ -1,20 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:title="Partager">
-        <menu>
-            <item
-                android:id="@+id/facebook"
-                android:title="Facebook" />
-            <item
-                android:id="@+id/twitter"
-                android:title="Twitter" />
-            <item
-                android:id="@+id/mail"
-                android:title="Mail" />
-        </menu>
-    </item>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/partager"
+        android:title="Partager"
+        app:showAsAction="never"/>
+
 
     <item
         android:id="@+id/call"
-        android:title="Appeler"/>
+        android:title="Appeler"
+        app:showAsAction="never"/>
 </menu>

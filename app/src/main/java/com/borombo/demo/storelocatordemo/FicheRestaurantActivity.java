@@ -1,5 +1,8 @@
 package com.borombo.demo.storelocatordemo;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -7,16 +10,24 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 /**
  * Created by Erwan on 19/04/2016.
  */
-public class FicheRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
+public class FicheRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback{
 
     private final String EXTRA_NAME = "Restaurant";
 
@@ -53,6 +64,9 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
 
         restaurant = (Restaurant) getIntent().getSerializableExtra(EXTRA_NAME);
 
@@ -94,6 +108,25 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.restaurant_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.partager:
+                return true;
+            case R.id.call:
+                callRestaurant();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
@@ -115,5 +148,24 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    public void callRestaurant(){
+        Intent callIntent = new Intent(Intent.ACTION_DIAL);
+        callIntent.setData(Uri.parse("tel:" + restaurant.getTelephone()));
+        try {
+            startActivity(callIntent);
+        } catch (ActivityNotFoundException activityException) {
+            Toast.makeText(getApplicationContext(),"yourActivity is not founded", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng latLng = new LatLng(restaurant.getLatitude(), restaurant.getLongitude());
+        googleMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("Marker"));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
     }
 }
