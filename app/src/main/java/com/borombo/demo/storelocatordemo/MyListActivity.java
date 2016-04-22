@@ -1,11 +1,13 @@
 package com.borombo.demo.storelocatordemo;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -90,7 +92,17 @@ public class MyListActivity extends AppCompatActivity implements NavigationView.
         if (id == R.id.site_web) {
             // Handle the camera action
         } else if (id == R.id.mentions_legales) {
-
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Mentions Légales")
+                    .setMessage(R.string.mentions_legales)
+                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         } else if (id == R.id.partager) {
 
         }

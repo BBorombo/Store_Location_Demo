@@ -2,4 +2,5 @@
     <string name="app_name">Store Locator Demo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="mentions_legales">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat, neque a mattis laoreet, enim neque gravida neque, ut interdum libero quam in massa. Etiam vitae viverra lacus. Mauris scelerisque. </string>
 </resources>

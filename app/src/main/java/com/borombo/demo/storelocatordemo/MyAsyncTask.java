@@ -1,7 +1,6 @@
 package com.borombo.demo.storelocatordemo;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -10,6 +9,9 @@ import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
+
+import com.google.android.gms.common.api.GoogleApiClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -49,29 +51,43 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
     JSONObject jsonData;
     ArrayList<Restaurant> listRestaurants = new ArrayList<>();
 
-    Activity activity;
+    MainActivity activity;
 
     private LocationManager locationManager;
 
     Location userLocation;
+    GoogleApiClient gApiClient;
 
-    public MyAsyncTask(Activity activity, LocationManager locationManager) {
+    public MyAsyncTask(MainActivity activity, LocationManager locationManager) {
         this.activity = activity;
         this.locationManager = locationManager;
     }
 
     @Override
     protected void onPreExecute() {
+        userLocation = activity.getmLastLocation();
+
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        }else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }else{
-            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        }else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+//            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+//        }else{
+//            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+//        }
+
+        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if (locationGPS != null){
+            Log.d("Location Manager GPS", "Lat : " + String.valueOf(locationGPS.getLatitude()));
+            Log.d("Location Manager GPS", "Long : " + String.valueOf(locationGPS.getLongitude()));
+        }
+        if (locationNet != null){
+            Log.d("Location Manager Net", "Lat : " + String.valueOf(locationNet.getLatitude()));
+            Log.d("Location ManagerNet", "Long : " + String.valueOf(locationNet.getLongitude()));
         }
     }
 
