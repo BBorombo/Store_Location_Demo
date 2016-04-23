@@ -3,16 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/greenLeon"
     tools:context="com.borombo.demo.storelocatordemo.MainActivity">
 
-    <TextView
+    <ImageView
+        android:id="@+id/logo"
+        android:src="@drawable/logo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="LOGO"
-        android:textSize="50sp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="140dp" />
+        android:layout_marginTop="110dp" />
 
 
     <ProgressBar
@@ -22,6 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="109dp" />
+        android:layout_marginBottom="110dp" />
 
 </RelativeLayout>

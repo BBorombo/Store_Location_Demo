@@ -1,17 +1,16 @@
 package com.borombo.demo.storelocatordemo;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.AsyncTask;
-import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,7 +29,7 @@ import java.util.Comparator;
 /**
  * Created by Erwan on 19/04/2016.
  */
-public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements LocationListener {
+public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
 
     private final String ID = "id";
     private final String NOM = "nom";
@@ -51,44 +50,26 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
     JSONObject jsonData;
     ArrayList<Restaurant> listRestaurants = new ArrayList<>();
 
-    MainActivity activity;
-
-    private LocationManager locationManager;
+    Activity activity;
 
     Location userLocation;
     GoogleApiClient gApiClient;
 
-    public MyAsyncTask(MainActivity activity, LocationManager locationManager) {
+    public MyAsyncTask(Activity activity, GoogleApiClient gApiClient) {
         this.activity = activity;
-        this.locationManager = locationManager;
+        this.gApiClient = gApiClient;
     }
 
     @Override
     protected void onPreExecute() {
-        userLocation = activity.getmLastLocation();
-
         if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-//        if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        }else if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-//            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//        }else{
-//            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//        }
+        userLocation = LocationServices.FusedLocationApi.getLastLocation(gApiClient);
 
-        Location locationGPS = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        Location locationNet = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (locationGPS != null){
-            Log.d("Location Manager GPS", "Lat : " + String.valueOf(locationGPS.getLatitude()));
-            Log.d("Location Manager GPS", "Long : " + String.valueOf(locationGPS.getLongitude()));
-        }
-        if (locationNet != null){
-            Log.d("Location Manager Net", "Lat : " + String.valueOf(locationNet.getLatitude()));
-            Log.d("Location ManagerNet", "Long : " + String.valueOf(locationNet.getLongitude()));
-        }
+        Log.d("Pos", "Lat : " + String.valueOf(userLocation.getLatitude()));
+        Log.d("Pos", "Long : " + String.valueOf(userLocation.getLongitude()));
     }
 
     @Override
@@ -153,30 +134,9 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> implements 
             }
         });
 
-
         Intent i = new Intent(this.activity, MyListActivity.class);
         i.putExtra("LIST", listRestaurants);
         activity.startActivity(i);
         activity.finish();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        this.userLocation = location;
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
     }
 }
