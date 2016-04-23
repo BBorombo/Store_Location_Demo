@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,7 +43,7 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
 
     private ImageView image;
 
-    private TextView infosSup;
+    private WebView infosSup;
     private TextView telephone;
 
     private TextView distance;
@@ -83,14 +84,16 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         infosSup = (TextView) findViewById(R.id.name);*/
         telephone = (TextView) findViewById(R.id.telephone);
         image = (ImageView) findViewById(R.id.image);
-        distance = (TextView) findViewById(R.id.distance);
+        infosSup = (WebView) findViewById(R.id.news);
 
         name.append(restaurant.getNom());
         adresse.setText(restaurant.getAdresse());
         ville.setText(restaurant.getCodePostal() + " " + restaurant.getVille());
         telephone.append(restaurant.getTelephone());
 
-        distance.append(restaurant.getDistanceToUser() +" "+ restaurant.getDistanceUnit());
+        restaurant.setInfosSup(restaurant.getInfosSup().replace("11px","18px"));
+        infosSup.loadData(restaurant.getInfosSup(), "text/html", null);
+//        distance.append(restaurant.getDistanceToUser() +" "+ restaurant.getDistanceUnit());
 
         Glide.with(this).load(restaurant.getPhotoUrl()).into(image);
 
