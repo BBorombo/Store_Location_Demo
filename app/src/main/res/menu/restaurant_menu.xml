@@ -4,8 +4,9 @@
     <item
         android:id="@+id/partager"
         android:title="Partager"
-        app:showAsAction="never"/>
-
+        app:showAsAction="never"
+        app:actionProviderClass=
+            "android.support.v7.widget.ShareActionProvider"/>
 
     <item
         android:id="@+id/call"

@@ -20,11 +20,13 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         protected TextView name;
         protected TextView adresse;
+        protected TextView distance;
 
         public DataObjectHolder(View itemView) {
             super(itemView);
-            name = (TextView) itemView.findViewById(R.id.textView);
-            adresse = (TextView) itemView.findViewById(R.id.textView2);
+            name = (TextView) itemView.findViewById(R.id.name);
+            adresse = (TextView) itemView.findViewById(R.id.adresse);
+            distance = (TextView) itemView.findViewById(R.id.distance);
             itemView.setOnClickListener(this);
         }
         @Override
@@ -45,8 +47,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public DataObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view, parent, false);
-        DataObjectHolder dataObjectHolder = new DataObjectHolder(view);
-        return dataObjectHolder;
+
+        return new DataObjectHolder(view);
     }
 
     @Override
@@ -54,6 +56,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         Restaurant data = cardData.get(position);
         holder.name.setText(data.getNom());
         holder.adresse.setText(data.getAdresse());
+        holder.distance.setText(formatDistance(data));
+    }
+
+    public String formatDistance(Restaurant data){
+        float distanceValue = data.getDistanceToUser();
+        String distanceUnit = data.getDistanceUnit();
+        if (distanceUnit.equals("km")){
+            distanceValue /= 1000;
+        }
+        return String.format("%.2f %s", distanceValue, distanceUnit);
     }
 
     @Override
@@ -61,7 +73,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return cardData.size();
     }
 
-    public interface MyClickListener {
+    interface MyClickListener {
         public void onItemClick(int position, View v);
     }
 

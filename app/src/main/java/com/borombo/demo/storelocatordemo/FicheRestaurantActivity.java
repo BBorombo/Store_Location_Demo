@@ -5,15 +5,19 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.webkit.WebView;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -51,10 +55,12 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
     private double latitude;
     private double longitude;
 
+    ShareActionProvider shareAction;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fiche_restaurant);
+        setContentView(R.layout.activity_restaurant);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -74,6 +80,7 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
 
         restaurant = (Restaurant) getIntent().getSerializableExtra(EXTRA_NAME);
 
+
         this.latitude = restaurant.getLatitude();
         this.longitude = restaurant.getLongitude();
 
@@ -91,11 +98,18 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         ville.setText(restaurant.getCodePostal() + " " + restaurant.getVille());
         telephone.append(restaurant.getTelephone());
 
-        restaurant.setInfosSup(restaurant.getInfosSup().replace("11px","18px"));
+        restaurant.setInfosSup(restaurant.getInfosSup().replace("11px", "18px"));
         infosSup.loadData(restaurant.getInfosSup(), "text/html", null);
-//        distance.append(restaurant.getDistanceToUser() +" "+ restaurant.getDistanceUnit());
 
         Glide.with(this).load(restaurant.getPhotoUrl()).into(image);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                launchItinerary();
+            }
+        });
 
         /*
             Récupération des vues et ajout des informations spécifique au restaurant
@@ -110,6 +124,7 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_right);
         }
     }
 
@@ -123,6 +138,8 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.partager:
+                shareAction = (ShareActionProvider) MenuItemCompat.getActionProvider(item);
+                shareAction.setShareIntent(getInfoShareItent());
                 return true;
             case R.id.call:
                 callRestaurant();
@@ -134,11 +151,12 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.site_web) {
-            // Handle the camera action
+            String url = getString(R.string.website);
+            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse(url) );
+            startActivity(intent);
         } else if (id == R.id.mentions_legales) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Mentions Légales")
@@ -152,13 +170,42 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
             AlertDialog dialog = builder.create();
             dialog.show();
         } else if (id == R.id.partager) {
-
+            startActivity(Intent.createChooser(getWebShareItent(), "Partager via"));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+
+    public void launchItinerary(){
+        String latitude = String.valueOf(restaurant.getLatitude()).replace(',','.');
+        String longitude = String.valueOf(restaurant.getLongitude()).replace(',','.');
+        Uri gmmIntentUri = Uri.parse(String.format("google.navigation:q=%s, %s", latitude, longitude));
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        startActivity(mapIntent);
+    }
+
+    public Intent getWebShareItent(){
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, R.string.website);
+        shareIntent.setType("text/plain");
+        return shareIntent;
+    }
+
+    public Intent getInfoShareItent(){
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, String.format("%s%s", getString(R.string.leon), restaurant.getNom()));
+        String text = String.format("%s%s \n%s \n%s %s \n%s%s",
+                getString(R.string.leon), restaurant.getNom(), restaurant.getAdresse(),
+                restaurant.getCodePostal(), restaurant.getVille(), getString(R.string.tel), restaurant.getTelephone());
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.setType("text/plain");
+        return shareIntent;
+    }
+
 
     public void callRestaurant(){
         Intent callIntent = new Intent(Intent.ACTION_DIAL);

@@ -5,4 +5,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="mentions_legales">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat, neque a mattis laoreet, enim neque gravida neque, ut interdum libero quam in massa. Etiam vitae viverra lacus. Mauris scelerisque. </string>
     <string name="textGPSDialog">"Pour améliorer les performance de l'application il est conseillé d'utiliser le GPS. Voulez vous l'activer ?"</string>
+    <string name="website">http://www.leon-de-bruxelles.fr/</string>
+    <string name="leon">Leon de Bruxelles - </string>
+    <string name="tel">Tel : </string>
+
 </resources>

@@ -2,9 +2,12 @@ package com.borombo.demo.storelocatordemo;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -17,9 +20,14 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -46,6 +54,10 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
     private final String PHOTOURL = "photo";
     private final String INFOSSUP = "infosSupplementaires";
     private final String TELEPHONE = "Telephone";
+
+    private final String FILE_NAME = "listData";
+
+    private boolean fromStorage = false;
 
     JSONObject jsonData;
     ArrayList<Restaurant> listRestaurants = new ArrayList<>();
@@ -75,11 +87,22 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected JSONObject doInBackground(String... params) {
         StringBuilder stringData = new StringBuilder();
-
+        InputStream inputStream = null;
+        if (hasActiveInternetConnection()){
+            try {
+                URL url = new URL(params[0]);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                inputStream = connection.getInputStream();
+                writeFile(inputStream);
+                inputStream = getFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else {
+            fromStorage = true;
+            inputStream = getFile();
+        }
         try{
-            URL url = new URL(params[0]);
-            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-            InputStream inputStream = connection.getInputStream();
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
@@ -88,10 +111,41 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
             jsonData = new JSONObject(stringData.toString());
         }catch (IOException e){
             e.printStackTrace();
-        } catch (JSONException e) {
+        }catch (JSONException e) {
             e.printStackTrace();
         }
-        return  jsonData;
+        return jsonData;
+
+    }
+
+    public InputStream getFile(){
+        File file = new File(activity.getExternalFilesDir(null), FILE_NAME);
+        InputStream input = null;
+        try {
+            input = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return input;
+    }
+
+    public void writeFile(InputStream input){
+        File file = new File(activity.getExternalFilesDir(null), FILE_NAME);
+        try {
+            OutputStream output = new FileOutputStream(file);
+            byte data[] = new byte[4096];
+            int count;
+            while ((count = input.read(data)) != -1) {
+                // allow canceling with back button
+                if (isCancelled()) {
+                    input.close();
+                    return;
+                }
+                output.write(data, 0, count);
+            }
+        }catch (java.io.IOException e){
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -136,7 +190,33 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
 
         Intent i = new Intent(this.activity, MyListActivity.class);
         i.putExtra("LIST", listRestaurants);
+        i.putExtra("GET_DATA",fromStorage);
         activity.startActivity(i);
         activity.finish();
+    }
+
+    public boolean isNetworkAvailable(){
+        ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+        return (networkInfo != null);
+    }
+
+    public boolean hasActiveInternetConnection() {
+        boolean res = false;
+        if (isNetworkAvailable()) {
+            try {
+                HttpURLConnection urlc = (HttpURLConnection)
+                        (new URL("http://clients3.google.com/generate_204")
+                                .openConnection());
+                urlc.setRequestProperty("User-Agent", "Test");
+                urlc.setRequestProperty("Connection", "close");
+                urlc.setConnectTimeout(1500);
+                urlc.connect();
+                res =  (urlc.getResponseCode() == 204 && urlc.getContentLength() == 0);
+            } catch (IOException e) {
+                Log.e("Check Connection", "Error checking internet connection", e);
+            }
+        }
+        return res;
     }
 }

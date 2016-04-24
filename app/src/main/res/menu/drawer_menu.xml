@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/tools">
 
     <item
         android:id="@+id/site_web"
-        android:icon="@android:drawable/ic_menu_camera"
-        android:title="Sitye Web" />
+        android:icon="@drawable/ic_explore"
+        android:title="Site Web" />
     <item
         android:id="@+id/mentions_legales"
-        android:icon="@android:drawable/ic_menu_edit"
+        android:icon="@drawable/ic_gavel"
         android:title="Mentions Légales" />
     <item
         android:id="@+id/partager"
-        android:icon="@android:drawable/ic_menu_share"
-        android:title="Partager l'app" />
-
+        android:icon="@drawable/ic_share"
+        android:title="Partager l'app"
+        app:actionProviderClass=
+            "android.support.v7.widget.ShareActionProvider"/>
 
 </menu>
