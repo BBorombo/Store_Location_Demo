@@ -5,15 +5,15 @@
     <item
         android:id="@+id/site_web"
         android:icon="@drawable/ic_explore"
-        android:title="Site Web" />
+        android:title="@string/site" />
     <item
         android:id="@+id/mentions_legales"
         android:icon="@drawable/ic_gavel"
-        android:title="Mentions Légales" />
+        android:title="@string/mentions" />
     <item
         android:id="@+id/partager"
         android:icon="@drawable/ic_share"
-        android:title="Partager l'app"
+        android:title="@string/app_share"
         app:actionProviderClass=
             "android.support.v7.widget.ShareActionProvider"/>
 

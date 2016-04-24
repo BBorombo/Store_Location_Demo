@@ -41,7 +41,6 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
 
     ArrayList<Restaurant> list;
 
-    private final String EXTRA_NAME = "Restaurant";
     private boolean fromStorage;
 
     private SwipeRefreshLayout refresh;
@@ -57,7 +56,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         setSupportActionBar(toolbar);
 
         Intent intent = getIntent();
-        list = (ArrayList<Restaurant>) intent.getSerializableExtra("LIST");
+        list = (ArrayList<Restaurant>) intent.getSerializableExtra(getString(R.string.list_tag));
 
         recyclerView = (RecyclerView) findViewById(R.id.recycleView);
         recyclerView.setHasFixedSize(true);
@@ -76,9 +75,9 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        fromStorage = getIntent().getBooleanExtra("GET_DATA", false);
+        fromStorage = getIntent().getBooleanExtra(getString(R.string.getData_tag), false);
         if (fromStorage){
-            Snackbar snackBar = Snackbar.make(drawer, "Les données issue de votre appareil ne sont peut être pas à jour.", Snackbar.LENGTH_LONG)
+            Snackbar snackBar = Snackbar.make(drawer, getString(R.string.snackbar), Snackbar.LENGTH_LONG)
                     .setAction("Ok", new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -113,7 +112,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
             @Override
             public void onItemClick(int position, View v) {
                 Intent intent = new Intent(MyListActivity.this, FicheRestaurantActivity.class);
-                intent.putExtra(EXTRA_NAME, list.get(position));
+                intent.putExtra(getString(R.string.restaurant_tag), list.get(position));
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_left);
             }
@@ -140,7 +139,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
             startActivity(intent);
         } else if (id == R.id.mentions_legales) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Mentions Légales")
+            builder.setTitle(getString(R.string.mentions))
                     .setMessage(R.string.mentions_legales)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -151,7 +150,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
             AlertDialog dialog = builder.create();
             dialog.show();
         } else if (id == R.id.partager) {
-            startActivity(Intent.createChooser(getWebShareItent(), "Partager via"));
+            startActivity(Intent.createChooser(getWebShareItent(), getString(R.string.share_via)));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

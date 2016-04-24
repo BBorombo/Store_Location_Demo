@@ -79,9 +79,6 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
             return;
         }
         userLocation = LocationServices.FusedLocationApi.getLastLocation(gApiClient);
-
-        Log.d("Pos", "Lat : " + String.valueOf(userLocation.getLatitude()));
-        Log.d("Pos", "Long : " + String.valueOf(userLocation.getLongitude()));
     }
 
     @Override
@@ -136,7 +133,6 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
             byte data[] = new byte[4096];
             int count;
             while ((count = input.read(data)) != -1) {
-                // allow canceling with back button
                 if (isCancelled()) {
                     input.close();
                     return;
@@ -189,8 +185,8 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
         });
 
         Intent i = new Intent(this.activity, MyListActivity.class);
-        i.putExtra("LIST", listRestaurants);
-        i.putExtra("GET_DATA",fromStorage);
+        i.putExtra(activity.getString(R.string.list_tag), listRestaurants);
+        i.putExtra(activity.getString(R.string.getData_tag),fromStorage);
         activity.startActivity(i);
         activity.finish();
     }

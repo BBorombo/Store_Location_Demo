@@ -1,14 +1,132 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.borombo.demo.storelocatordemo.FicheRestaurantActivity"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:showIn="@layout/activity_restaurant">
 
-    <include
-        layout="@layout/content_fiche_restaurant"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
 
+        <android.support.v7.widget.CardView
+            style="@style/Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/name"
+                    android:text="@string/leon"
+                    style="@style/Title_Card" />
+
+                <TextView
+                    android:id="@+id/adresse"
+                    android:text="Adresse"
+                    style="@style/Text" />
+
+                <TextView
+                    android:id="@+id/ville"
+                    android:text="Ville"
+                    android:layout_marginBottom="10dp"
+                    style="@style/Text" />
+
+                <TextView
+                    android:id="@+id/telephone"
+                    android:text="Tel : "
+                    style="@style/Text" />
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            style="@style/Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_infos"
+                    android:text="Informations complémentaires"
+                    style="@style/Title_Card" />
+
+                <WebView
+                    android:id="@+id/infos"
+                    android:paddingLeft="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    style="@style/Icon_Info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:id="@+id/parking"
+                        android:src="@drawable/parking"
+                        style="@style/Icon"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/handicape"
+                        android:src="@drawable/handicapee"
+                        style="@style/Icon"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/terrasse"
+                        android:src="@drawable/terrasse"
+                        style="@style/Icon"
+                        android:layout_weight="1"/>
+
+                    <ImageView
+                        android:id="@+id/enfants"
+                        android:src="@drawable/enfants"
+                        style="@style/Icon"
+                        android:layout_weight="1"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </android.support.v7.widget.CardView>
+
+        <android.support.v7.widget.CardView
+            style="@style/Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/title_Maps"
+                    android:text="Localisation"
+                    style="@style/Title_Card" />
+
+                <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:name="com.google.android.gms.maps.MapFragment"
+                    android:id="@+id/map"
+                    android:layout_margin="10dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="300dp"/>
+
+            </LinearLayout>
+
+        </android.support.v7.widget.CardView>
+    </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

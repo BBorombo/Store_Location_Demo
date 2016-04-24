@@ -23,37 +23,34 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by Erwan on 19/04/2016.
  */
 public class FicheRestaurantActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback{
 
-    private final String EXTRA_NAME = "Restaurant";
-
     private Restaurant restaurant;
 
     private TextView name;
     private TextView adresse;
     private TextView ville;
-    private TextView complementAdresse;
 
     private ImageView image;
 
     private WebView infosSup;
     private TextView telephone;
 
-    private TextView distance;
-
-    private double latitude;
-    private double longitude;
+    private ImageView parking;
+    private ImageView handicape;
+    private ImageView terrasse;
+    private ImageView enfants;
 
     ShareActionProvider shareAction;
 
@@ -61,8 +58,11 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_restaurant);
+        restaurant = (Restaurant) getIntent().getSerializableExtra(getString(R.string.restaurant_tag));
+
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(restaurant.getNom());
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -78,20 +78,19 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         MapFragment mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
-        restaurant = (Restaurant) getIntent().getSerializableExtra(EXTRA_NAME);
-
-
-        this.latitude = restaurant.getLatitude();
-        this.longitude = restaurant.getLongitude();
 
         name = (TextView) findViewById(R.id.name);
         adresse = (TextView) findViewById(R.id.adresse);
         ville = (TextView) findViewById(R.id.ville);
-        /*complementAdresse = (TextView) findViewById(R.id.name);
-        infosSup = (TextView) findViewById(R.id.name);*/
+
         telephone = (TextView) findViewById(R.id.telephone);
         image = (ImageView) findViewById(R.id.image);
-        infosSup = (WebView) findViewById(R.id.news);
+        infosSup = (WebView) findViewById(R.id.infos);
+
+        parking = (ImageView) findViewById(R.id.parking);
+        handicape = (ImageView) findViewById(R.id.handicape);
+        terrasse = (ImageView) findViewById(R.id.terrasse);
+        enfants = (ImageView) findViewById(R.id.enfants);
 
         name.append(restaurant.getNom());
         adresse.setText(restaurant.getAdresse());
@@ -101,7 +100,23 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         restaurant.setInfosSup(restaurant.getInfosSup().replace("11px", "18px"));
         infosSup.loadData(restaurant.getInfosSup(), "text/html", null);
 
-        Glide.with(this).load(restaurant.getPhotoUrl()).into(image);
+        if (!restaurant.isParking()){
+            parking.setVisibility(View.INVISIBLE);
+        }
+
+        if (!restaurant.isHandicape()){
+            handicape.setVisibility(View.INVISIBLE);
+        }
+
+        if (!restaurant.isTerrasse()){
+            terrasse.setVisibility(View.INVISIBLE);
+        }
+
+        if (!restaurant.isEspaceEnfant()){
+            enfants.setVisibility(View.INVISIBLE);
+        }
+
+        Picasso.with(this).load(restaurant.getPhotoUrl()).into(image);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -110,10 +125,6 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
                 launchItinerary();
             }
         });
-
-        /*
-            Récupération des vues et ajout des informations spécifique au restaurant
-         */
 
     }
 
@@ -159,7 +170,7 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
             startActivity(intent);
         } else if (id == R.id.mentions_legales) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Mentions Légales")
+            builder.setTitle(getString(R.string.mentions))
                     .setMessage(R.string.mentions_legales)
                     .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
@@ -170,7 +181,7 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
             AlertDialog dialog = builder.create();
             dialog.show();
         } else if (id == R.id.partager) {
-            startActivity(Intent.createChooser(getWebShareItent(), "Partager via"));
+            startActivity(Intent.createChooser(getWebShareItent(), getString(R.string.share_via)));
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -178,13 +189,12 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         return true;
     }
 
-
     public void launchItinerary(){
         String latitude = String.valueOf(restaurant.getLatitude()).replace(',','.');
         String longitude = String.valueOf(restaurant.getLongitude()).replace(',','.');
         Uri gmmIntentUri = Uri.parse(String.format("google.navigation:q=%s, %s", latitude, longitude));
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-        mapIntent.setPackage("com.google.android.apps.maps");
+        mapIntent.setPackage(getString(R.string.googlePackage));
         startActivity(mapIntent);
     }
 
@@ -205,7 +215,6 @@ public class FicheRestaurantActivity extends AppCompatActivity implements Naviga
         shareIntent.setType("text/plain");
         return shareIntent;
     }
-
 
     public void callRestaurant(){
         Intent callIntent = new Intent(Intent.ACTION_DIAL);

@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/partager"
-        android:title="Partager"
+        android:title="@string/share"
         app:showAsAction="never"
         app:actionProviderClass=
             "android.support.v7.widget.ShareActionProvider"/>
 
     <item
         android:id="@+id/call"
-        android:title="Appeler"
+        android:title="@string/call"
         app:showAsAction="never"/>
 </menu>

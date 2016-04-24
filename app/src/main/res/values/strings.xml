@@ -1,12 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Common -->
     <string name="app_name">Store Locator Demo</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="mentions_legales">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque volutpat, neque a mattis laoreet, enim neque gravida neque, ut interdum libero quam in massa. Etiam vitae viverra lacus. Mauris scelerisque. </string>
-    <string name="textGPSDialog">"Pour améliorer les performance de l'application il est conseillé d'utiliser le GPS. Voulez vous l'activer ?"</string>
     <string name="website">http://www.leon-de-bruxelles.fr/</string>
-    <string name="leon">Leon de Bruxelles - </string>
+    <string name="leon">Léon de Bruxelles - </string>
+    <string name="list_tag">LIST</string>
+    <string name="getData_tag">GET_DATA</string>
+    <string name="restaurant_tag">RESTAURANT</string>
+
+    <!--Main Activity-->
+    <string name="textGPSDialog">"Pour améliorer les performance de l'application il est conseillé d'utiliser le GPS. Voulez vous l'activer ?"</string>
+
+    <!-- List Activity-->
+    <string name="snackbar">Les données issue de votre appareil ne sont peut être pas à jour.</string>
+
+    <!-- Restaurant Activity-->
+    <string name="share_via">Partager via</string>
+    <string name="googlePackage">com.google.android.apps.maps</string>
     <string name="tel">Tel : </string>
+
+    <!-- Menu Lateral-->
+    <string name="site">Site Web</string>
+    <string name="mentions">Mentions Légales</string>
+    <string name="app_share">"Partager l'app"</string>
+
+    <!-- Menu Option-->
+    <string name="call">Appeler</string>
+    <string name="share">"Partager"</string>
 
 </resources>

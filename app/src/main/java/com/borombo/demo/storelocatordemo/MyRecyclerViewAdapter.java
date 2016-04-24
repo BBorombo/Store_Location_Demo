@@ -74,7 +74,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     }
 
     interface MyClickListener {
-        public void onItemClick(int position, View v);
+        void onItemClick(int position, View v);
     }
 
 }

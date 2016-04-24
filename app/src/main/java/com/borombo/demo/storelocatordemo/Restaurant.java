@@ -79,9 +79,7 @@ public class Restaurant implements Serializable{
         return complementAdresse;
     }
 
-    public void setComplementAdresse(String complementAdresse) {
-        this.complementAdresse = complementAdresse;
-    }
+    public void setComplementAdresse(String complementAdresse) { this.complementAdresse = complementAdresse; }
 
     public String getCodePostal() {
         return codePostal;

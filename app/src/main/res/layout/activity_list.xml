@@ -41,12 +41,9 @@
         </android.support.v4.widget.SwipeRefreshLayout>
 
 
-
         <android.support.design.widget.NavigationView
             android:id="@+id/nav_view"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
+            style="@style/navigationView"
             app:menu="@menu/drawer_menu"/>
 
     </android.support.v4.widget.DrawerLayout>
