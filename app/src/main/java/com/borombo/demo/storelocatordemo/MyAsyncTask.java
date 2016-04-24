@@ -59,13 +59,13 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
 
     private boolean fromStorage = false;
 
-    JSONObject jsonData;
-    ArrayList<Restaurant> listRestaurants = new ArrayList<>();
+    private  JSONObject jsonData;
+    private  ArrayList<Restaurant> listRestaurants = new ArrayList<>();
 
-    Activity activity;
+    private  Activity activity;
 
-    Location userLocation;
-    GoogleApiClient gApiClient;
+    private Location userLocation;
+    private GoogleApiClient gApiClient;
 
     public MyAsyncTask(Activity activity, GoogleApiClient gApiClient) {
         this.activity = activity;
@@ -78,6 +78,7 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
                 && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        // On récupère la position de l'utilisateur
         userLocation = LocationServices.FusedLocationApi.getLastLocation(gApiClient);
     }
 
@@ -85,26 +86,35 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
     protected JSONObject doInBackground(String... params) {
         StringBuilder stringData = new StringBuilder();
         InputStream inputStream = null;
+        // Si il y a une connexion internet
         if (hasActiveInternetConnection()){
             try {
+                // On télécharge le fichier
                 URL url = new URL(params[0]);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 inputStream = connection.getInputStream();
+                // On l'écrit/remplace dans la mémoire
                 writeFile(inputStream);
+                // Pour une raison inconnue, après l'écriture, il m'est impossible de lire l'inputStream
+                // alors qu'hors connexion, cela fonctionne, je récupère donc le fichier que je viens d'écrire
                 inputStream = getFile();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // Si il n'y a pas de connexion internet
         }else {
+            // On récupère le fichier depuis la mémoire
             fromStorage = true;
             inputStream = getFile();
         }
         try{
+            // On traite le flux afin d'obtenir une chaine de caractères contenant les données
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 stringData.append(line);
             }
+            // On transforme ces données en objet JSON qui est traité par la suite
             jsonData = new JSONObject(stringData.toString());
         }catch (IOException e){
             e.printStackTrace();
@@ -115,7 +125,12 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
 
     }
 
+    /**
+     * Fonction permettant de récupérer le fichier dans la mémoire
+     * @return Le flux du fichier récupéré
+     */
     public InputStream getFile(){
+        // On récupère le fichier par son nom
         File file = new File(activity.getExternalFilesDir(null), FILE_NAME);
         InputStream input = null;
         try {
@@ -126,13 +141,20 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
         return input;
     }
 
+    /**
+     * Fonction permettant d'écrire le fichier dans la mémoire
+     * @param input Le flux du fichier JSON
+     */
     public void writeFile(InputStream input){
+        // On créer le fichier
         File file = new File(activity.getExternalFilesDir(null), FILE_NAME);
         try {
             OutputStream output = new FileOutputStream(file);
             byte data[] = new byte[4096];
             int count;
+            // On recopie le flux dans le fichier
             while ((count = input.read(data)) != -1) {
+                // Si l'écriture est interompue, on ferme le flux
                 if (isCancelled()) {
                     input.close();
                     return;
@@ -147,7 +169,9 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
     @Override
     protected void onPostExecute(JSONObject s) {
         try {
+            // On récupère la liste de restaurant
             JSONArray restaurants = s.getJSONArray("restaurants");
+            // Pour chaque restaurant, on créer un objet correspondant, et on récupère les infos
             for (int i =0; i < restaurants.length(); i++){
                 JSONObject c =restaurants.getJSONObject(i);
                 Restaurant r = new Restaurant();
@@ -171,19 +195,19 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
                 r.setPhotoUrl(c.getString(PHOTOURL));
                 r.setInfosSup(c.getString(INFOSSUP));
                 r.setTelephone(c.getString(TELEPHONE));
-
+                // On ajoute le restaurant à laliste
                 listRestaurants.add(r);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
+        // On tri la liste par ordre croissant en fonction de la distance de ceux ci avec l'utilisateur
         Collections.sort(listRestaurants, new Comparator<Restaurant>() {
             public int compare(Restaurant res1, Restaurant res2) {
                 return Float.valueOf(res1.getDistanceToUser()).compareTo(res2.getDistanceToUser());
             }
         });
-
+        // On passe à l'activité suivante en passant la liste, et le boolean permettant de savoir d'ou vient la liste
         Intent i = new Intent(this.activity, MyListActivity.class);
         i.putExtra(activity.getString(R.string.list_tag), listRestaurants);
         i.putExtra(activity.getString(R.string.getData_tag),fromStorage);
@@ -191,15 +215,26 @@ public class MyAsyncTask extends AsyncTask<String, Void, JSONObject> {
         activity.finish();
     }
 
+    /**
+     * Fonction permettant de savoir si l'appareil est connecté à un réseau
+     * @return
+     */
     public boolean isNetworkAvailable(){
         ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
         return (networkInfo != null);
     }
 
+    /**
+     * Fonction permettant de savoir si l'appareil est connecté à Internet
+     * @return
+     */
     public boolean hasActiveInternetConnection() {
         boolean res = false;
+        // Si l'appareil est connecté à un réseau
         if (isNetworkAvailable()) {
+            // On teste avec un serveur de Google afin d'être sur que le réseau est connecté à internet,
+            // et n'est pas juste local
             try {
                 HttpURLConnection urlc = (HttpURLConnection)
                         (new URL("http://clients3.google.com/generate_204")

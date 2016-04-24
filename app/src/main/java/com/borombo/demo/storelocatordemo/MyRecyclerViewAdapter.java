@@ -47,7 +47,6 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     public DataObjectHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.card_view, parent, false);
-
         return new DataObjectHolder(view);
     }
 
@@ -59,6 +58,11 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         holder.distance.setText(formatDistance(data));
     }
 
+    /**
+     * Fonction qui permet de formater la distance à afficher
+     * @param data Le restaurant courant
+     * @return La chaine avec la distance formatée
+     */
     public String formatDistance(Restaurant data){
         float distanceValue = data.getDistanceToUser();
         String distanceUnit = data.getDistanceUnit();

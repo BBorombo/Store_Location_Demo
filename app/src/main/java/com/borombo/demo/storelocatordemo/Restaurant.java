@@ -36,17 +36,16 @@ public class Restaurant implements Serializable{
 
     public float getDistanceToUser(){return this.distanceToUser;}
 
+    /**
+     * Fonciton qui calcule la distance entre l'utilisateur et le restaurant
+     * @param userLocation La location de l'utilisateur
+     */
     public void setDistanceToUser(Location userLocation){
         Location rLocation = new Location("Restaurant Location");
         rLocation.setLongitude(this.longitude);
         rLocation.setLatitude(this.latitude);
         distanceToUser = userLocation.distanceTo(rLocation);
-        if (distanceToUser > 1000){
-            //distanceToUser/=1000;
-            distanceUnit = "km";
-        }else {
-            distanceUnit ="m";
-        }
+        distanceUnit = (distanceToUser > 1000) ? "km" : "m";
     }
 
     public String getDistanceUnit() {return distanceUnit;}

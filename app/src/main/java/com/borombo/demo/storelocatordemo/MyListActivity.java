@@ -1,25 +1,19 @@
 package com.borombo.demo.storelocatordemo;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuItem;
 import android.view.View;
 
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -30,17 +24,17 @@ import java.util.ArrayList;
 /**
  * Created by Erwan on 19/04/2016.
  */
-public class MyListActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, SwipeRefreshLayout.OnRefreshListener, NavigationView.OnNavigationItemSelectedListener{
+public class MyListActivity extends LateralMenuActivity implements GoogleApiClient.ConnectionCallbacks, SwipeRefreshLayout.OnRefreshListener{
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter adapter;
     private RecyclerView.LayoutManager layoutManager;
-    public GoogleApiClient mGoogleApiClient;
+    private GoogleApiClient mGoogleApiClient;
 
     private Location userLocation;
 
-    ArrayList<Restaurant> list;
-
+    private ArrayList<Restaurant> list;
+    // Variable qui permet de Savoir si la liste vient de la mémoire de l'appareil
     private boolean fromStorage;
 
     private SwipeRefreshLayout refresh;
@@ -50,22 +44,26 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
+        // Initialisation du GoogleAPIClient
         setGoogleApiClient();
 
+        // Initialisation de la Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // Récupération de la liste de restaurant
         Intent intent = getIntent();
         list = (ArrayList<Restaurant>) intent.getSerializableExtra(getString(R.string.list_tag));
 
+        // Initialisation de la RecyclerView
         recyclerView = (RecyclerView) findViewById(R.id.recycleView);
         recyclerView.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-
         adapter = new MyRecyclerViewAdapter(list);
         recyclerView.setAdapter(adapter);
 
+        // Initialisation du Menu latéral
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -75,7 +73,9 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // On regarde si la liste provient du Fichier JSON sur internet, ou celui stocké dans la mémoire de l'appareil
         fromStorage = getIntent().getBooleanExtra(getString(R.string.getData_tag), false);
+        // Si il provient de la mémoire, on informe l'utilisateur
         if (fromStorage){
             Snackbar snackBar = Snackbar.make(drawer, getString(R.string.snackbar), Snackbar.LENGTH_LONG)
                     .setAction("Ok", new View.OnClickListener() {
@@ -87,7 +87,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
             snackBar.getView().setBackgroundColor(getColor(R.color.colorPrimary));
             snackBar.show();
         }
-
+        // Initialisation du SwipteRefresh
         refresh = (SwipeRefreshLayout) findViewById(R.id.refresh);
         refresh.setOnRefreshListener(this);
         refresh.setColorSchemeColors(getColor(R.color.greenLeon));
@@ -108,6 +108,8 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
     @Override
     protected void onResume() {
         super.onResume();
+        // Lorsqu'on clique sur un élément de la liste, on récupère le restaurant correspondant
+        // et on l'affiche dans l'activité appropriée
         ((MyRecyclerViewAdapter) adapter).setOnItemClickListener(new MyRecyclerViewAdapter.MyClickListener() {
             @Override
             public void onItemClick(int position, View v) {
@@ -119,44 +121,7 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         });
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.site_web) {
-            String url = getString(R.string.website);
-            Intent intent = new Intent( Intent.ACTION_VIEW, Uri.parse(url) );
-            startActivity(intent);
-        } else if (id == R.id.mentions_legales) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle(getString(R.string.mentions))
-                    .setMessage(R.string.mentions_legales)
-                    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.dismiss();
-                        }
-                    });
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        } else if (id == R.id.partager) {
-            startActivity(Intent.createChooser(getWebShareItent(), getString(R.string.share_via)));
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
-    }
 
     @Override
     public void onRefresh() {
@@ -164,7 +129,9 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
                 && ActivityCompat.checkSelfPermission(MyListActivity.this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
+        // On récupère la position de l'utilisateur
         userLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        // Si celle ci n'est pas nulle, on mets à jour la distance avec les restaurant
         if (userLocation != null){
             updateDistance();
         }
@@ -172,6 +139,9 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         refresh.setRefreshing(false);
     }
 
+    /**
+     * Fonction qui initialise le GoogleAPIClient
+     */
     public void setGoogleApiClient(){
         if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -181,6 +151,10 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         }
     }
 
+    /**
+     * Fonction qui permet de récupérer l'intent pour partager l'adresse web
+     * @return
+     */
     public Intent getWebShareItent(){
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
         shareIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.website));
@@ -188,6 +162,9 @@ public class MyListActivity extends AppCompatActivity implements GoogleApiClient
         return shareIntent;
     }
 
+    /**
+     * Fonction qui permet de mettre à jour la distance des restaurant
+     */
     public void updateDistance(){
         for (Restaurant r: list) {
             r.setDistanceToUser(userLocation);
