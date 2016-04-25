@@ -42,7 +42,7 @@
                 <TextView
                     android:id="@+id/telephone"
                     android:text="Tel : "
-                    style="@style/Text" />
+                    style="@style/Tel" />
 
             </LinearLayout>
         </android.support.v7.widget.CardView>

@@ -162,9 +162,9 @@ public class FicheRestaurantActivity extends LateralMenuActivity implements OnMa
      */
     public Intent getInfoShareItent(){
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.putExtra(Intent.EXTRA_SUBJECT, String.format("%s%s", getString(R.string.leon), restaurant.getNom()));
+        shareIntent.putExtra(Intent.EXTRA_SUBJECT, String.format("%s %s", getString(R.string.leon), restaurant.getNom()));
         // On formate le texte à partager avec les informations
-        String text = String.format("%s%s \n%s \n%s %s \n%s%s",
+        String text = String.format("%s %s \n%s \n%s %s \n%s%s",
                 getString(R.string.leon), restaurant.getNom(), restaurant.getAdresse(),
                 restaurant.getCodePostal(), restaurant.getVille(), getString(R.string.tel), restaurant.getTelephone());
         shareIntent.putExtra(Intent.EXTRA_TEXT, text);
